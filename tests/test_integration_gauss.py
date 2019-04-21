@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
 
-from integration import gauss
-from area.grid import Grid
-from area.boundary import Boundary
+from numerical.integration import gauss
+from numerical.area.grid import Grid
+from numerical.area.boundary import Boundary
 
 
 class GaussIntegrationTest(unittest.TestCase):
