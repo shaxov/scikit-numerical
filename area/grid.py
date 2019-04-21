@@ -55,13 +55,6 @@ class _grid:
         data['b1spline_iter'] = np.arange(0, data['n_roots'] + 1, dtype=np.float64)
         return data
 
-    # @staticmethod
-    # def _add_interpolation_meta(data):
-    #     b1spline_steps = np.arange(0, data['n_roots'] + 1, dtype=np.float64)
-    #     b1spline_gen = (el for el in b1spline_steps)
-    #     data['b1spline_gen'] = lambda n: np.array(list(itertools.islice(b1spline_gen, n)), dtype=np.float64)
-    #     return data
-
     def build_cartesian(self, boundary, step):
         self._cartesian_data = _grid._build(boundary, step)
 
@@ -103,18 +96,6 @@ class Grid:
         self._data = {}
         self._build()
 
-    def set_steps(self, steps):
-        self.steps = np.array(steps, dtype=np.float64)
-        self._build()
-
-    def decrease_steps(self):
-        self.steps /= 2
-        self._build()
-
-    def increase_steps(self):
-        self.steps *= 4
-        self._build()
-
     def _build_grids(self):
         self._grids = []
         for grid_id, (boundary, step) in enumerate(zip(self.boundaries, self.steps)):
@@ -134,7 +115,6 @@ class Grid:
 
     def _build(self):
         self._build_grids()
-
         self._data = self._count_roots(self._data)
         self._data = self._build_mesh(self._data)
 
