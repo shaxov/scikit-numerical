@@ -10,7 +10,4 @@ python:
 install:
   - pip install -r requirements.txt
 
-env:
-  - export CODACY_PROJECT_TOKEN=de088f2647664bfbae3736e75410f5d5
-
-script: bash .testcov.sh
+script: bash .testcov
