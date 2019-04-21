@@ -3,6 +3,7 @@ from numpy.polynomial.legendre import leggauss
 
 from area.grid import Grid
 from utils.linalg import multi_dot2
+from integration.utils import repeat_args
 
 
 def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, batch_size: tuple = None):
@@ -36,34 +37,6 @@ def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, bat
     return np.dot(nd_outer_diff, result)[0]
 
 
-def _repeat(f_args, n_roots, cnt_reps):
-    """ Repeat arguments as cartesian product.
-
-    Args:
-        f_args: list of arguments for repeating.
-        n_roots: int, number of roots in gauss-legender quadrature.
-        cnt_reps: list of int, repeat count for each argument.
-    Returns:
-        list of numpy.ndarray of repeated arguments' value.
-    """
-    if len(f_args) == 1:
-        return f_args
-
-    elif len(f_args) == 2:
-        xx_rep = np.repeat(np.repeat(f_args[0], n_roots, axis=1), repeats=cnt_reps[1], axis=0)
-        yy_rep = np.tile(f_args[1], (cnt_reps[0], n_roots))
-        return np.array([xx_rep, yy_rep])
-
-    elif len(f_args) == 3:
-        xx_rep = np.repeat(np.repeat(f_args[0], n_roots * n_roots, axis=1), repeats=cnt_reps[1] * cnt_reps[2], axis=0)
-        yy_rep = np.repeat(np.tile(f_args[1], (cnt_reps[0], n_roots * n_roots)), repeats=cnt_reps[2], axis=0)
-        zz_rep = np.tile(f_args[2], (cnt_reps[0] * cnt_reps[1], n_roots * n_roots))
-        return np.array([xx_rep, yy_rep, zz_rep])
-
-    else:
-        raise ValueError("Repeating arguments for dims > 3 is not implemented.")
-
-
 def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count,
                       batch_position, batch_size, nest_id=-1):
     if nest_id == ndgrid.dim - 1:
@@ -79,7 +52,7 @@ def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, ro
             batch_args.append(batch_arg)
             cnt_reps.append(len(sum_batch))
 
-        f_val = ndfunc(_repeat(batch_args, roots_count, cnt_reps))
+        f_val = ndfunc(repeat_args(batch_args, roots_count, cnt_reps))
         fw_mul = np.matmul(f_val, nd_leg_weights)
         result_list.append(fw_mul)
     else:
