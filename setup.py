@@ -11,7 +11,7 @@ setuptools.setup(
     description="Tools for numerical math calculations",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Bellator95/numerical",
+    url="https://github.com/Bellator95/scikit-numerical",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
