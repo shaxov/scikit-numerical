@@ -1,50 +1,42 @@
 import numpy as np
-from nles.utils.area.boundary import Boundary
 from numpy.polynomial.legendre import leggauss
 
-from nles.utils.area.grid import Grid
+from area.grid import Grid
+from utils.linalg import multi_dot2
 
 
-def gl_integrate(func, grid, n_roots, batch_size):
-    """ Gauss-Legendre function integration
+def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, batch_size: tuple = None):
+    """ Integrate a function numerically using Gauss formula
 
-    Attributes:
-        func: function which takes numpy.ndarray with first shape equal to n, where n - count of variables (max 3).
-        grid: nles.utils.area.grid.Grid object which contains data for numerical integration.
-        n_roots: count of zero roots in Legendre polynomial.
+    Args:
+        ndfunc: function which takes numpy.ndarray where the first shape equal to n, where n is a count of variables (max 3).
+        ndgrid: area.grid.Grid object which contains grid data for numerical integration.
+        roots_count: count of zero roots in Legendre polynomial.
         batch_size: tuple, batch size for integration process
 
     Returns:
         numpy.ndarray values of function integral in grid area.
     """
-    (roots, weights) = leggauss(n_roots)
-    roots = roots.reshape(1, -1)
+    if batch_size is None:
+        batch_size = (32,) * ndgrid.dim
+
+    leg_roots, leg_weights = leggauss(roots_count)
+    leg_roots = leg_roots.reshape(1, -1)
 
     result = []
-    start = [0] * grid.dim
-    w = _multi_dot(*([weights] * grid.dim)).ravel().reshape(-1, 1)
-    outer_diff = _multi_dot(*[grid1d['diff'] for grid1d in grid]).ravel()
-
-    _integration_loop(grid, func, w, roots, n_roots, start, batch_size, result)
-    mm = np.concatenate(result)
-    return np.dot(outer_diff, mm)[0]
-
-
-def _multi_dot(*vectors):
-    """ Pairwise vectors product.
-
-    Args:
-        vectors: tuple of numpy.array with len(shape) = 1
-    Returns:
-        numpy.ndarray
-    """
-    if len(vectors) == 1:
-        return vectors[0]
-    vec_dot = np.dot(np.expand_dims(vectors[0], -1), np.expand_dims(vectors[1], 0))
-    return _multi_dot(vec_dot, *vectors[2:])
+    # positions of batch step for each dimension
+    batch_position = [0] * ndgrid.dim
+    # pairwise product of legendre weights for function evaluation
+    nd_leg_weights = multi_dot2(*(ndgrid.dim * [leg_weights]), flatten=True, reshape=True)
+    # pairwise product of grid steps diff for the left function multiplication
+    nd_outer_diff = multi_dot2(*[gd['diff'] for gd in ndgrid], flatten=True)
+    # batch integration recursive loop with output in 'results'
+    _integration_loop(result, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count, batch_position, batch_size)
+    result = np.concatenate(result)
+    return np.dot(nd_outer_diff, result)[0]
 
 
-def _repeat(f_args, n_roots=None, cnt_reps=None):
+def _repeat(f_args, n_roots, cnt_reps):
     """ Repeat arguments as cartesian product.
 
     Args:
@@ -58,45 +50,51 @@ def _repeat(f_args, n_roots=None, cnt_reps=None):
         return f_args
 
     elif len(f_args) == 2:
-        xx_rep = np.repeat(np.repeat(f_args[0], n_roots, axis=1),
-                           cnt_reps[1], axis=0)
-        yy_rep = np.tile(np.tile(f_args[1], (1, n_roots)),
-                         (cnt_reps[0], 1))
-        return [xx_rep, yy_rep]
+        xx_rep = np.repeat(np.repeat(f_args[0], n_roots, axis=1), repeats=cnt_reps[1], axis=0)
+        yy_rep = np.tile(f_args[1], (cnt_reps[0], n_roots))
+        return np.array([xx_rep, yy_rep])
 
     elif len(f_args) == 3:
-        xx_rep = np.repeat(np.repeat(f_args[0], n_roots * n_roots, axis=1),
-                           cnt_reps[1] * cnt_reps[2], axis=0)
-        yy_rep = np.repeat(np.tile(np.tile(f_args[1], (1, n_roots * n_roots)), (cnt_reps[0], 1)),
-                           cnt_reps[2], axis=0)
-        zz_rep = np.tile(np.tile(f_args[2], (1, n_roots * n_roots)),
-                         (cnt_reps[0] * cnt_reps[1], 1))
-        return [xx_rep, yy_rep, zz_rep]
+        xx_rep = np.repeat(np.repeat(f_args[0], n_roots * n_roots, axis=1), repeats=cnt_reps[1] * cnt_reps[2], axis=0)
+        yy_rep = np.repeat(np.tile(f_args[1], (cnt_reps[0], n_roots * n_roots)), repeats=cnt_reps[2], axis=0)
+        zz_rep = np.tile(f_args[2], (cnt_reps[0] * cnt_reps[1], n_roots * n_roots))
+        return np.array([xx_rep, yy_rep, zz_rep])
 
     else:
         raise ValueError("Repeating arguments for dims > 3 is not implemented.")
 
 
-def _integration_loop(grid, func, w, roots, n_roots, _start, batch_size, result_array: list, nest_id=-1):
-    if nest_id == grid.dim - 1:
-        args = [np.add(grid[i]['sum'][_start[i]:_start[i] + batch_size[i]],
-                       np.dot(grid[i]['diff_t'][_start[i]:_start[i] + batch_size[i]], roots))
-                for i in range(grid.dim)]
+def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count,
+                      batch_position, batch_size, nest_id=-1):
+    if nest_id == ndgrid.dim - 1:
+        batch_args = []
+        cnt_reps = []
+        for dim in range(ndgrid.dim):
+            dim_batch_position = batch_position[dim]
+            sum_batch = ndgrid[dim]['sum'][dim_batch_position:dim_batch_position + batch_size[dim]]
+            diff_t_batch = ndgrid[dim]['diff_t'][dim_batch_position:dim_batch_position + batch_size[dim]]
+            # i-dim batch function argument
+            batch_arg = sum_batch + diff_t_batch @ leg_roots
 
-        cnt_reps = [len(grid[i]['sum'][_start[i]:_start[i] + batch_size[i]]) for i in range(grid.dim)]
-        f_val = func(np.array(_repeat(args, n_roots, cnt_reps)))
+            batch_args.append(batch_arg)
+            cnt_reps.append(len(sum_batch))
 
-        result_array.append(np.matmul(f_val, w))
+        f_val = ndfunc(_repeat(batch_args, roots_count, cnt_reps))
+        fw_mul = np.matmul(f_val, nd_leg_weights)
+        result_list.append(fw_mul)
     else:
         nest_id += 1
-        while _start[nest_id] < grid[nest_id]['n_roots']:
-            _integration_loop(grid, func, w, roots, n_roots, _start, batch_size, result_array, nest_id)
-            _start[nest_id] += batch_size[nest_id]
-        _start[nest_id] = 0
+        while batch_position[nest_id] < ndgrid[nest_id]['n_roots']:
+            _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count,
+                              batch_position, batch_size, nest_id)
+            batch_position[nest_id] += batch_size[nest_id]
+        batch_position[nest_id] = 0
 
 
 if __name__ == '__main__':
     from time import perf_counter
+    from area.grid import Grid
+    from area.boundary import Boundary
 
 
     def f(x):
@@ -110,7 +108,7 @@ if __name__ == '__main__':
     grid = Grid([Boundary(-3.24, 9.24)], [0.02])
     print(grid)
     start = perf_counter()
-    assert np.allclose(gl_integrate(f, grid, 16, (64,)), [411.580])
+    assert np.allclose(integrate(f, grid, 16, (64,)), [411.580])
     print(perf_counter() - start, '\n')
 
     boundary_x = Boundary(0, 1)
@@ -119,7 +117,7 @@ if __name__ == '__main__':
 
     print(grid)
     start = perf_counter()
-    assert np.allclose(gl_integrate(f2, grid, 16, (64, 64)), [72.9887])
+    assert np.allclose(integrate(f2, grid, 16, (64, 64)), [72.9887])
     print(perf_counter() - start, '\n')
 
     boundary_x = Boundary(-1, 1.5)
@@ -134,7 +132,7 @@ if __name__ == '__main__':
 
     print(grid)
     start = perf_counter()
-    val = gl_integrate(f, grid, 16, (128, 128, 128))
+    val = integrate(f, grid, 16, (32, 32, 32))
     print(f"Integral value: {val}")
     assert np.allclose(val, [5.77375])
     print(f"Calculation time: {perf_counter() - start:.2f}s")

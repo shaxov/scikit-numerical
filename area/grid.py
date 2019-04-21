@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
-from nles.utils.area.boundary import Boundary
-from nles.utils.transform.coord_transform import polar2cartesian, cartesian2polar
+from area.boundary import Boundary
+from utils.coord_transform import polar2cartesian
 from typing import List
 
 EPS = 1e-8
