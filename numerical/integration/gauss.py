@@ -1,9 +1,9 @@
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 
-from area.grid import Grid
-from utils.linalg import multi_dot2
-from integration.utils import repeat_args
+from numerical.area.grid import Grid
+from numerical.utils.linalg import multi_dot2
+from numerical.integration.utils import repeat_args
 
 
 def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, batch_size: tuple = None):
