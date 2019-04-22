@@ -1,12 +1,10 @@
 import numpy as np
 from numpy.polynomial.legendre import leggauss
-
-from numerical.area.grid import Grid
 from numerical.utils.linalg import multi_dot2
 from numerical.integration.utils import repeat_args
 
 
-def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, batch_size: tuple = None):
+def integrate(ndfunc: "numpy function", ndgrid: "area grid", roots_count: int = 32, batch_size: tuple = None):
     """ Integrate a function numerically using Gauss formula
 
     Args:
@@ -30,7 +28,7 @@ def integrate(ndfunc: "numpy function", ndgrid: Grid, roots_count: int = 32, bat
     # pairwise product of legendre weights for function evaluation
     nd_leg_weights = multi_dot2(*(ndgrid.dim * [leg_weights]), flatten=True, reshape=True)
     # pairwise product of grid steps diff for the left function multiplication
-    nd_outer_diff = multi_dot2(*[gd['diff'] for gd in ndgrid], flatten=True)
+    nd_outer_diff = multi_dot2(*[gd.diff for gd in ndgrid], flatten=True)
     # batch integration recursive loop with output in 'results'
     _integration_loop(result, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count, batch_position, batch_size)
     result = np.concatenate(result)
@@ -44,8 +42,8 @@ def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, ro
         cnt_reps = []
         for dim in range(ndgrid.dim):
             dim_batch_position = batch_position[dim]
-            sum_batch = ndgrid[dim]['sum'][dim_batch_position:dim_batch_position + batch_size[dim]]
-            diff_t_batch = ndgrid[dim]['diff_t'][dim_batch_position:dim_batch_position + batch_size[dim]]
+            sum_batch = ndgrid[dim].sum[dim_batch_position:dim_batch_position + batch_size[dim]]
+            diff_t_batch = ndgrid[dim].diff_t[dim_batch_position:dim_batch_position + batch_size[dim]]
             # i-dim batch function argument
             batch_arg = sum_batch + diff_t_batch @ leg_roots
 
@@ -57,7 +55,7 @@ def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, ro
         result_list.append(fw_mul)
     else:
         nest_id += 1
-        while batch_position[nest_id] < ndgrid[nest_id]['n_roots']:
+        while batch_position[nest_id] < ndgrid[nest_id].nodes_count:
             _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count,
                               batch_position, batch_size, nest_id)
             batch_position[nest_id] += batch_size[nest_id]
