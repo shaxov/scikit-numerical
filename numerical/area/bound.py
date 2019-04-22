@@ -19,14 +19,14 @@ class _BoundaryIterable(metaclass=ABCMeta):
         self._bounds_count = len(data)
 
     def __iter__(self):
-        self._bound_id = -1
+        self._bound_id = 0
         return self
 
     def __next__(self):
-        if self._bound_id == self._bounds_count - 1:
+        if self._bound_id == self._bounds_count:
             raise StopIteration
         self._bound_id += 1
-        return self._data[self._bound_id]
+        return self._data[self._bound_id - 1]
 
     def __getitem__(self, item):
         return self._data[item]
