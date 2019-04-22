@@ -38,7 +38,7 @@ class _BoundaryIterable(metaclass=ABCMeta):
 class _LineBoundary(_BaseBoundary):
     """ The class represents start and end of 1-dim line. """
     def __init__(self, start, end):
-        if end <= start:
+        if end < start or np.allclose(start, end):
             raise BoundarySetupException
 
         self.start = np.float64(start)
