@@ -1,5 +1,4 @@
 import unittest
-import numpy as np
 from numerical.area import bound
 
 
