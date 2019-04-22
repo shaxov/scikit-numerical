@@ -8,9 +8,6 @@ class _BaseBoundary(metaclass=ABCMeta):
     def plot(self, save_path=None):
         """ Visualizes boundary. """
 
-    def _is_bound_valid(self, *args):
-        """ Validate boundary initialization data. """
-
     def _set_described_rect(self):
         """ Set n-dim rectangular bound which describes initial bound. """
 
@@ -41,14 +38,11 @@ class _BoundaryIterable(metaclass=ABCMeta):
 class _LineBoundary(_BaseBoundary):
     """ The class represents start and end of 1-dim line. """
     def __init__(self, start, end):
-        if not self._is_bound_valid(start, end):
+        if end <= start:
             raise BoundarySetupException
 
         self.start = np.float64(start)
         self.end = np.float64(end)
-
-    def _is_bound_valid(self, start, end):
-        return end > start
 
     def plot(self, save_path=None):
         plt.hlines(0.0, self.start, self.end, colors='black')
