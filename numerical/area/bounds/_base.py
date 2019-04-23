@@ -11,7 +11,8 @@ class BaseBoundary(metaclass=ABCMeta):
     def _set_described_rect(self):
         """ Set n-dim rectangular bound which describes initial bound. """
 
-    def _is_boundary_valid(self, *args, **kwargs):
+    @abstractmethod
+    def _is_boundary_valid(self):
         """ Validate the data which gives for boundary initialization. """
 
 
@@ -41,14 +42,14 @@ class BoundaryIterable(metaclass=ABCMeta):
 class LineBoundary(BaseBoundary):
     """ The class represents start and end of 1-dim line. """
     def __init__(self, start, end):
-        if not self._is_boundary_valid(start, end):
-            raise BoundarySetupException
-
         self.start = np.float64(start)
         self.end = np.float64(end)
 
-    def _is_boundary_valid(self, start, end):
-        return end > start and not np.allclose(start, end)
+        if not self._is_boundary_valid():
+            raise BoundarySetupException
+
+    def _is_boundary_valid(self):
+        return self.end > self.start and not np.allclose(self.start, self.end)
 
     def plot(self, save_path=None):
         plt.hlines(0.0, self.start, self.end, colors='black')
@@ -70,8 +71,10 @@ class PolarRhoLineBoundary(LineBoundary):
         # 'start' can be greater than 'end'
         super().__init__(start, end)
 
-    def _is_boundary_valid(self, start, end):
-        return not np.allclose(start, end) and (start > 0.0 or np.allclose(start, 0.0)) and not np.allclose(end, 0.0)
+    def _is_boundary_valid(self):
+        return (not np.allclose(self.start, self.end)
+                and (self.start > 0.0 or np.allclose(self.start, 0.0))
+                and not np.allclose(self.end, 0.0))
 
 
 class PolarPhiLineBoundary(LineBoundary):
@@ -81,10 +84,10 @@ class PolarPhiLineBoundary(LineBoundary):
         # 'start' and 'end' can be in range from 0 to 2*Pi
         super().__init__(start, end)
 
-    def _is_boundary_valid(self, start, end):
-        return (start < end and not np.allclose(start, end)
-                and (0.0 < start < 2*np.pi or np.allclose(start, 0.0) or np.allclose(start, 2*np.pi))
-                and (0.0 < end < 2*np.pi or np.allclose(end, 0.0) or np.allclose(end, 2*np.pi)))
+    def _is_boundary_valid(self):
+        return (self.start < self.end and not np.allclose(self.start, self.end)
+                and (0.0 < self.start < 2*np.pi or np.allclose(self.start, 0.0) or np.allclose(self.start, 2*np.pi))
+                and (0.0 < self.end < 2*np.pi or np.allclose(self.end, 0.0) or np.allclose(self.end, 2*np.pi)))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
