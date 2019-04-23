@@ -13,7 +13,7 @@ class CircleSegmentBoundary(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self._is_polar = True
+        self.is_polar = True
 
     def _set_described_rect(self):
         self._described_rect = self._data

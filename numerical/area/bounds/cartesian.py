@@ -10,7 +10,7 @@ class LineBoundary1D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self._is_polar = False
+        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data
@@ -33,7 +33,7 @@ class LineBoundary2D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self._is_polar = False
+        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data
@@ -73,7 +73,7 @@ class LineBoundary3D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self._is_polar = False
+        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data

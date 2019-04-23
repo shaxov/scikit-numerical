@@ -75,3 +75,4 @@ class UniformGrid(_GridIterable):
         super().__init__(
             [_UniformGrid(bd, st) for bd, st in zip(bound.get_described_rect(), step)]
         )
+        self.is_polar = bound.is_polar
