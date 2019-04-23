@@ -99,8 +99,7 @@ class LineBoundary2D(_BoundaryIterable):
         plt.vlines([x_start, x_end], y_start, y_end, colors='black', linestyle='-', linewidth=3)
         plt.vlines([x_start2, x_end2], y_start2, y_end2, colors='red', linestyle='--', linewidth=1)
 
-        plt.legend(('Defined boundary', 'Described rect'),
-                   loc='upper right')
+        plt.legend(('Defined boundary', 'Described rect'), loc='upper right')
 
         if save_path:
             plt.savefig(save_path)
