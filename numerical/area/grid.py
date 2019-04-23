@@ -72,7 +72,9 @@ class _UniformGrid(_BaseGrid):
 
 class UniformGrid(_GridIterable):
     def __init__(self, bound: "area boundary", step: list):
+        if bound.bounds_count != len(step):
+            raise ValueError("Boundary dimension and steps count don't match.")
         super().__init__(
             [_UniformGrid(bd, st) for bd, st in zip(bound.get_described_rect(), step)]
         )
-        self.is_polar = bound.is_polar
+        self.coords_type = bound.COORDS_TYPE

@@ -20,14 +20,14 @@ class BoundaryIterable(metaclass=ABCMeta):
     """ The class represents iterator interface for boundaries. """
     def __init__(self, data: list):
         self._data = data
-        self._bounds_count = len(data)
+        self.bounds_count = len(data)
 
     def __iter__(self):
         self._bound_id = 0
         return self
 
     def __next__(self):
-        if self._bound_id == self._bounds_count:
+        if self._bound_id == self.bounds_count:
             raise StopIteration
         self._bound_id += 1
         return self._data[self._bound_id - 1]

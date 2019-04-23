@@ -2,7 +2,11 @@ from numerical.area.bounds import _base
 import matplotlib.pyplot as plt
 
 
-class LineBoundary1D(_base.BoundaryIterable):
+class CartesianCoordinates:
+    COORDS_TYPE = "cartesian"
+
+
+class LineBoundary1D(_base.BoundaryIterable, CartesianCoordinates):
     def __init__(self, x_start, x_end):
         super().__init__(
             [
@@ -10,7 +14,6 @@ class LineBoundary1D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data
@@ -22,7 +25,7 @@ class LineBoundary1D(_base.BoundaryIterable):
         self._data[0].plot(save_path)
 
 
-class LineBoundary2D(_base.BoundaryIterable):
+class LineBoundary2D(_base.BoundaryIterable, CartesianCoordinates):
     def __init__(self,
                  x_start, x_end,
                  y_start, y_end):
@@ -33,7 +36,6 @@ class LineBoundary2D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data
@@ -60,7 +62,7 @@ class LineBoundary2D(_base.BoundaryIterable):
             plt.show()
 
 
-class LineBoundary3D(_base.BoundaryIterable):
+class LineBoundary3D(_base.BoundaryIterable, CartesianCoordinates):
     def __init__(self,
                  x_start, x_end,
                  y_start, y_end,
@@ -73,7 +75,6 @@ class LineBoundary3D(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self.is_polar = False
 
     def _set_described_rect(self):
         self._described_rect = self._data

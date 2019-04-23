@@ -2,7 +2,11 @@ import numpy as np
 from numerical.area.bounds import _base
 
 
-class CircleSegmentBoundary(_base.BoundaryIterable):
+class PolarCoordinates:
+    COORDS_TYPE = "polar"
+
+
+class CircleSegmentBoundary(_base.BoundaryIterable, PolarCoordinates):
     def __init__(self,
                  rho_start, rho_end,
                  phi_start, phi_end):
@@ -13,7 +17,6 @@ class CircleSegmentBoundary(_base.BoundaryIterable):
             ]
         )
         self._set_described_rect()
-        self.is_polar = True
 
     def _set_described_rect(self):
         self._described_rect = self._data
