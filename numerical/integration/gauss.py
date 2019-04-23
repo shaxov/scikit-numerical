@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 from numerical.utils.linalg import multi_dot2
-from numerical.integration.utils import repeat_args
+from numerical.integration.utils import repeat_args, coordinate_transform
 
 
 def integrate(ndfunc: "numpy function", ndgrid: "area grid", roots_count: int = 32, batch_size: tuple = None):
@@ -18,6 +18,8 @@ def integrate(ndfunc: "numpy function", ndgrid: "area grid", roots_count: int = 
     """
     if batch_size is None:
         batch_size = (32,) * ndgrid.dim
+
+    ndfunc = coordinate_transform(ndfunc, ndgrid)
 
     leg_roots, leg_weights = leggauss(roots_count)
     leg_roots = leg_roots.reshape(1, -1)
