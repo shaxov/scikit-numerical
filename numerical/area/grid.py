@@ -73,5 +73,5 @@ class _UniformGrid(_BaseGrid):
 class UniformGrid(_GridIterable):
     def __init__(self, bound: "area boundary", step: list):
         super().__init__(
-            [_UniformGrid(bd, st) for bd, st in zip(bound, step)]
+            [_UniformGrid(bd, st) for bd, st in zip(bound.get_described_rect(), step)]
         )
