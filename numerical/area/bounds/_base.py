@@ -72,7 +72,7 @@ class PolarRhoLineBoundary(LineBoundary):
         super().__init__(start, end)
 
     def _is_boundary_valid(self, start, end):
-        return not np.allclose(start, end)
+        return not np.allclose(start, end) and (start > 0.0 or np.allclose(start, 0.0)) and not np.allclose(end, 0.0)
 
 
 class PolarPhiLineBoundary(LineBoundary):
