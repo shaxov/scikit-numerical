@@ -27,3 +27,15 @@ class GaussIntegrationTest(unittest.TestCase):
 
         grid = UniformGrid(bounds.cartesian.LineBoundary3D(-1, 1.5, -0.2, 0.5, 0, 1.8), [0.05, 0.05, 0.05])
         self.assertTrue(np.allclose(gauss.integrate(f, grid, 16, (32, 32, 32)), [5.77375]))
+
+    def test_circle_integration(self):
+        def f(x):
+            return np.power(x[0], 2) + 2 * x[1] + 5
+        grid = UniformGrid(bounds.polar.CircleBoundary(1.0), [0.1, np.pi/5])
+        self.assertTrue(np.allclose(gauss.integrate(f, grid), [16.49336]))
+
+    def test_half_circle_integration(self):
+        def f(x):
+            return np.power(x[0], 2) + 2 * x[1] + 5
+        grid = UniformGrid(bounds.polar.HalfCircleBoundary(1.0), [0.1, np.pi/10])
+        self.assertTrue(np.allclose(gauss.integrate(f, grid), [9.58001]))
