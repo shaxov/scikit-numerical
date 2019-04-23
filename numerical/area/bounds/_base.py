@@ -11,7 +11,6 @@ class BaseBoundary(metaclass=ABCMeta):
     def _set_described_rect(self):
         """ Set n-dim rectangular bound which describes initial bound. """
 
-    @abstractmethod
     def _is_boundary_valid(self, *args, **kwargs):
         """ Validate the data which gives for boundary initialization. """
 
