@@ -23,8 +23,10 @@ class CircleSegmentBoundary(_base.BoundaryIterable):
 
 
 class HalfCircleBoundary(CircleSegmentBoundary):
-    def __init__(self, rho_start, rho_end):
-        super().__init__(rho_start, rho_end, 0.0, np.pi)
+    def __init__(self, radius):
+        if radius < 0:
+            raise _base.BoundarySetupException("Radius cen not be negative.")
+        super().__init__(0.0, radius, 0.0, np.pi)
 
     def plot(self, save_path=None):
         raise NotImplementedError
@@ -32,6 +34,8 @@ class HalfCircleBoundary(CircleSegmentBoundary):
 
 class CircleBoundary(CircleSegmentBoundary):
     def __init__(self, radius):
+        if radius < 0:
+            raise _base.BoundarySetupException("Radius cen not be negative.")
         super().__init__(0.0, radius, 0.0, 2.*np.pi)
 
     def plot(self, save_path=None):
