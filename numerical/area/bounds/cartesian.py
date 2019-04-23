@@ -15,6 +15,9 @@ class LineBoundary1D(_base.BoundaryIterable):
     def _set_described_rect(self):
         self._described_rect = self._data
 
+    def get_described_rect(self):
+        return self._described_rect
+
     def plot(self, save_path=None):
         self._data[0].plot(save_path)
 
@@ -34,6 +37,9 @@ class LineBoundary2D(_base.BoundaryIterable):
 
     def _set_described_rect(self):
         self._described_rect = self._data
+
+    def get_described_rect(self):
+        return self._described_rect
 
     def plot(self, save_path=None):
         x_start, x_end = self._data[0].start, self._data[0].end
@@ -71,6 +77,9 @@ class LineBoundary3D(_base.BoundaryIterable):
 
     def _set_described_rect(self):
         self._described_rect = self._data
+
+    def get_described_rect(self):
+        return self._described_rect
 
     def plot(self, *args):
         raise NotImplementedError

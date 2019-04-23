@@ -18,6 +18,9 @@ class CircleSegmentBoundary(_base.BoundaryIterable):
     def _set_described_rect(self):
         self._described_rect = self._data
 
+    def get_described_rect(self):
+        return self._described_rect
+
     def plot(self, save_path=None):
         raise NotImplementedError
 
