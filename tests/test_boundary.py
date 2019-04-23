@@ -52,6 +52,36 @@ class BoundaryTest(unittest.TestCase):
         self.assertRaises(bounds.BoundarySetupException, PolarPhiLineBoundary, 0.0 - 1e-4, 2.0 * np.pi)
         self.assertRaises(bounds.BoundarySetupException, PolarPhiLineBoundary, 2.0 * np.pi, 0.0)
 
+    def test_polar_rho_exception(self):
+        from numerical.area.bounds._base import PolarRhoLineBoundary
+        self.assertRaises(bounds.BoundarySetupException, PolarRhoLineBoundary, -0.01, 2.0 * np.pi)
+
+    def test_circle_boundaries(self):
+        bd_cs = bounds.polar.CircleSegmentBoundary(0.0, 1.5, 0.0, 0.5 * np.pi)
+        bd_c = bounds.polar.CircleBoundary(5.0)
+        bd_hc = bounds.polar.HalfCircleBoundary(5.0)
+
+        self.assertAlmostEqual(bd_cs[0].start, 0.0)
+        self.assertAlmostEqual(bd_cs[0].end, 1.5)
+        self.assertAlmostEqual(bd_cs[1].start, 0.0)
+        self.assertAlmostEqual(bd_cs[1].end, 0.5 * np.pi)
+
+        self.assertAlmostEqual(bd_c[0].start, 0.0)
+        self.assertAlmostEqual(bd_c[0].end, 5.0)
+        self.assertAlmostEqual(bd_c[1].start, 0.0)
+        self.assertAlmostEqual(bd_c[1].end, 2. * np.pi)
+
+        self.assertAlmostEqual(bd_hc[0].start, 0.0)
+        self.assertAlmostEqual(bd_hc[0].end, 5.0)
+        self.assertAlmostEqual(bd_hc[1].start, 0.0)
+        self.assertAlmostEqual(bd_hc[1].end, np.pi)
+
+    def test_circle_boundary_exception(self):
+        self.assertRaises(bounds.BoundarySetupException, bounds.polar.CircleBoundary, -5.0)
+
+    def test_half_circle_boundary_exception(self):
+        self.assertRaises(bounds.BoundarySetupException, bounds.polar.HalfCircleBoundary, -5.0)
+
 
 
 
