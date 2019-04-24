@@ -17,3 +17,21 @@ def f(x):
 
 gauss.integrate(f, 0., 1.)  # 0.3333333
 ```
+
+- spline functions and theirs derivatives
+
+```python
+import numpy as np
+from numerical import splines
+import matplotlib.pyplot as plt
+
+x = np.arange(0, 4., 0.05)
+y = splines.shenberg(x)
+yd1 = splines.shenberg.d1(x)  # first derivative
+yd2 = splines.shenberg.d2(x)  # second derivative
+# visualize results
+plt.plot(x, y)
+plt.plot(x, yd1)
+plt.plot(x, yd2)
+plt.show()
+```
