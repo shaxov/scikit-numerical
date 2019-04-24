@@ -44,38 +44,41 @@ class _UniformGrid(_BaseGrid):
     'Uniform' means that distance between nearest nodes is the same
     for each node and defines as 'step'.
     """
-    def __init__(self, bound, step):
-        self._bound = bound
-        self._step = step
-
+    def __init__(self, start, end, step):
+        self.start = start
+        self.end = end
+        self.step = step
         self._build_nodes()
-        self._build_integration_meta()
 
     def _build_nodes(self):
-        self._nodes = np.arange(self._bound.start, self._bound.end, self._step)
-        self._nodes = np.append(self._nodes, self._bound.end)
-
-    def _build_integration_meta(self):
-        self.sum = ((self._nodes[1:] + self._nodes[:-1]) / 2.0).reshape(-1, 1)
-        self.diff = (self._nodes[1:] - self._nodes[:-1]) / 2.0
-        self.diff_t = self.diff.reshape(-1, 1)
-        self.nodes_count = len(self._nodes)
-
-    def get_nodes(self):
-        return self._nodes
+        self.nodes = np.arange(self.start, self.end, self.step)
+        self.nodes = np.append(self.nodes, self.end)
 
     def __repr__(self):
         return f"<{self.__class__.__name__}: " \
-            f"bound={str(self._bound)}, " \
-            f"step={str(self._step)}, " \
-            f"nodes_count={len(self._nodes)}>"
+            f"start={self.start}, " \
+            f"end={self.end}, " \
+            f"step={self.step}, " \
+            f"nodes_count={len(self.nodes)}>"
 
 
 class UniformGrid(_GridIterable):
-    def __init__(self, bound: "area boundary", step: list):
-        if bound.bounds_count != len(step):
-            raise ValueError("Boundary dimension and steps count don't match.")
+    def __init__(self, bounds: tuple, steps: tuple):
+        try:
+            bounds = np.array(bounds).reshape(-1, 2)
+        except ValueError:
+            raise ValueError("Number of bounds must be even. (2, 4 or 6).")
+
+        if len(bounds) > 6:
+            raise ValueError(f"Max number of bounds is 6. {len(bounds)} > 6")
+
+        if not steps:
+            steps = (0.05,) * bounds.shape[0]
+        steps = np.array(steps).reshape(-1, 1)
+
+        if len(bounds) != len(steps):
+            raise ValueError(f"Boundary dimension and steps count don't match. {len(bounds)} != {len(steps)}")
+
         super().__init__(
-            [_UniformGrid(bd, st) for bd, st in zip(bound.get_described_rect(), step)]
+            [_UniformGrid(*bd, st) for bd, st in zip(bounds, steps)]
         )
-        self.coords_type = bound.COORDS_TYPE

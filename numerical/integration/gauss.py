@@ -2,13 +2,23 @@ import numpy as np
 from numpy.polynomial.legendre import leggauss
 from numerical.utils.linalg import multi_dot2
 from numerical.integration.utils import repeat_args, coordinate_transform
+from numerical.area import grid
 
 
-def integrate(ndfunc: "numpy function", ndgrid: "area grid", roots_count: int = 32, batch_size: tuple = None):
+def integrate(ndfunc: "numpy function",
+              *bounds: "integration limits",
+              steps: tuple = (),
+              coords_type="cartesian",
+              ndgrid: "area grid" = None,
+              roots_count: int = 32,
+              batch_size: tuple = None):
     """ Integrate a function numerically using Gauss formula
 
     Args:
-        ndfunc: function which takes numpy.ndarray where the first shape equal to n, where n is a count of variables (max 3).
+        ndfunc: function which takes numpy.ndarray where the first shape equal to n, where n is a count of variables 1<= n <=3.
+        bounds: tuple of floats which indicate integration limits
+        steps: tuple of floats which indicates integration steps
+        coords_type: str, type of coordinates for integration ('cartesian', 'polar', 'spherical')
         ndgrid: area.grid.Grid object which contains grid data for numerical integration.
         roots_count: count of zero roots in Legendre polynomial.
         batch_size: tuple, batch size for integration process
@@ -16,10 +26,15 @@ def integrate(ndfunc: "numpy function", ndgrid: "area grid", roots_count: int = 
     Returns:
         numpy.ndarray values of function integral in grid area.
     """
+
+    if bounds:
+        ndgrid = grid.UniformGrid(bounds, steps)
+
     if batch_size is None:
         batch_size = (32,) * ndgrid.dim
 
-    ndfunc = coordinate_transform(ndfunc, ndgrid)
+    ndfunc = coordinate_transform(ndfunc, coords_type)
+    _build_integration_meta(ndgrid)
 
     leg_roots, leg_weights = leggauss(roots_count)
     leg_roots = leg_roots.reshape(1, -1)
@@ -62,3 +77,11 @@ def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, ro
                               batch_position, batch_size, nest_id)
             batch_position[nest_id] += batch_size[nest_id]
         batch_position[nest_id] = 0
+
+
+def _build_integration_meta(ndgrid):
+    for g in ndgrid:
+        g.sum = ((g.nodes[1:] + g.nodes[:-1]) / 2.0).reshape(-1, 1)
+        g.diff = (g.nodes[1:] - g.nodes[:-1]) / 2.0
+        g.diff_t = g.diff.reshape(-1, 1)
+        g.nodes_count = len(g.nodes)

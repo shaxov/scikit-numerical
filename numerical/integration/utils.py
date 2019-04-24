@@ -30,10 +30,14 @@ def repeat_args(f_args, n_roots, cnt_reps):
         raise ValueError("Repeating arguments for dims > 3 is not implemented.")
 
 
-def coordinate_transform(ndfunc, ndgrid):
-    if ndgrid.coords_type == "polar":
+def coordinate_transform(ndfunc, coords_type):
+    if coords_type == "cartesian":
+        return ndfunc
+    elif coords_type == "polar":
         def ndfunc_t(x):
             return ndfunc(polar2cartesian(x)) * x[0]
         return ndfunc_t
+    elif coords_type == "spherical":
+        raise NotImplementedError("Spherical coordinates was not implemented.")
     else:
-        return ndfunc
+        raise ValueError("Coordinates type can be 'cartesian', 'polar' or 'spherical'.")
