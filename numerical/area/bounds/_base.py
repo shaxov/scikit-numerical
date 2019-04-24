@@ -8,19 +8,26 @@ class BaseBoundary(metaclass=ABCMeta):
     def plot(self, save_path=None):
         """ Visualizes boundary. """
 
+    @abstractmethod
+    def _is_valid(self):
+        """ Validate the data which gives for boundary initialization. """
+
+
+class BaseIntegrableBoundary(metaclass=ABCMeta):
+    @abstractmethod
     def _set_described_rect(self):
         """ Set n-dim rectangular bound which describes initial bound. """
 
     @abstractmethod
-    def _is_boundary_valid(self):
-        """ Validate the data which gives for boundary initialization. """
+    def get_described_rect(self):
+        """ Returns n-dim rectangular bound which describes initial bound. """
 
 
 class BoundaryIterable(metaclass=ABCMeta):
     """ The class represents iterator interface for boundaries. """
-    def __init__(self, data: list):
-        self._data = data
-        self.bounds_count = len(data)
+    def __init__(self, bounds: list):
+        self._bounds = bounds
+        self.bounds_count = len(bounds)
 
     def __iter__(self):
         self._bound_id = 0
@@ -29,14 +36,15 @@ class BoundaryIterable(metaclass=ABCMeta):
     def __next__(self):
         if self._bound_id == self.bounds_count:
             raise StopIteration
+        bound = self._bounds[self._bound_id]
         self._bound_id += 1
-        return self._data[self._bound_id - 1]
+        return bound
 
     def __getitem__(self, item):
-        return self._data[item]
+        return self._bounds[item]
 
     def __repr__(self):
-        return "<[" + ", ".join([bnd.__repr__() for bnd in self._data]) + "]>"
+        return "<[" + ", ".join([bnd.__repr__() for bnd in self._bounds]) + "]>"
 
 
 class LineBoundary(BaseBoundary):
@@ -45,10 +53,10 @@ class LineBoundary(BaseBoundary):
         self.start = np.float64(start)
         self.end = np.float64(end)
 
-        if not self._is_boundary_valid():
+        if not self._is_valid():
             raise BoundarySetupException
 
-    def _is_boundary_valid(self):
+    def _is_valid(self):
         return self.end > self.start and not np.allclose(self.start, self.end)
 
     def plot(self, save_path=None):
@@ -71,7 +79,7 @@ class PolarRhoLineBoundary(LineBoundary):
         # 'start' can be greater than 'end'
         super().__init__(start, end)
 
-    def _is_boundary_valid(self):
+    def _is_valid(self):
         return (not np.allclose(self.start, self.end)
                 and (self.start > 0.0 or np.allclose(self.start, 0.0))
                 and not np.allclose(self.end, 0.0))
@@ -84,7 +92,7 @@ class PolarPhiLineBoundary(LineBoundary):
         # 'start' and 'end' can be in range from 0 to 2*Pi
         super().__init__(start, end)
 
-    def _is_boundary_valid(self):
+    def _is_valid(self):
         return (self.start < self.end and not np.allclose(self.start, self.end)
                 and (0.0 < self.start < 2*np.pi or np.allclose(self.start, 0.0) or np.allclose(self.start, 2*np.pi))
                 and (0.0 < self.end < 2*np.pi or np.allclose(self.end, 0.0) or np.allclose(self.end, 2*np.pi)))
