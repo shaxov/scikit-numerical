@@ -69,6 +69,9 @@ class UniformGrid(_GridIterable):
         except ValueError:
             raise ValueError("Number of bounds must be even. (2, 4 or 6).")
 
+        if len(bounds) > 6:
+            raise ValueError(f"Max number of bounds is 6. {len(bounds)} > 6")
+
         if not steps:
             steps = (0.05,) * bounds.shape[0]
         steps = np.array(steps).reshape(-1, 1)

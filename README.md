@@ -15,5 +15,5 @@ from numerical.integration import gauss
 def f(x):
     return np.power(x[0], 2)
 
-gauss.integrate(f, 0., 1.)
+gauss.integrate(f, 0., 1.)  # 0.3333333
 ```
