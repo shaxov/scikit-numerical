@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.polynomial.legendre import leggauss
 from numerical.utils.linalg import multi_dot2
-from numerical.integration.utils import repeat_args, coordinate_transform
+from numerical.utils.integration import repeat_args, coordinate_transform
 from numerical.area import grid
 
 
