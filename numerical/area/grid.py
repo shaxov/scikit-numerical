@@ -21,14 +21,15 @@ class _GridIterable(metaclass=ABCMeta):
         self.dim = len(data)
 
     def __iter__(self):
-        self._grid_id = -1
+        self._grid_id = 0
         return self
 
     def __next__(self):
-        if self._grid_id == self.dim - 1:
+        if self._grid_id == self.dim:
             raise StopIteration
+        grid = self._data[self._grid_id]
         self._grid_id += 1
-        return self._data[self._grid_id]
+        return grid
 
     def __getitem__(self, item):
         return self._data[item]
@@ -72,6 +73,9 @@ class _UniformGrid(_BaseGrid):
 
 class UniformGrid(_GridIterable):
     def __init__(self, bound: "area boundary", step: list):
+        if bound.bounds_count != len(step):
+            raise ValueError("Boundary dimension and steps count don't match.")
         super().__init__(
-            [_UniformGrid(bd, st) for bd, st in zip(bound, step)]
+            [_UniformGrid(bd, st) for bd, st in zip(bound.get_described_rect(), step)]
         )
+        self.coords_type = bound.COORDS_TYPE

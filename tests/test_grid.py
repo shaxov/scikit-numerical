@@ -1,13 +1,13 @@
 import unittest
 import numpy as np
-from numerical.area import bound
+from numerical.area import bounds
 from numerical.area import grid
 
 
 class GridTest(unittest.TestCase):
 
     def test_uniform_grid(self):
-        bd = bound.LineBoundary1D(0.0, 1.0)
+        bd = bounds.cartesian.LineBoundary1D(0.0, 1.0)
         gd = grid.UniformGrid(bd, step=[0.05])
         test_nodes = gd[0].get_nodes()
         true_nodes = np.arange(0.0, 1.0, 0.05)
@@ -26,7 +26,7 @@ class GridTest(unittest.TestCase):
         test_diff_t = gd[0].diff_t
         self.assertTrue(np.allclose(test_diff_t, true_diff_t))
 
-        bd = bound.LineBoundary1D(-0.74, 1.25)
+        bd = bounds.cartesian.LineBoundary1D(-0.74, 1.25)
         gd = grid.UniformGrid(bd, step=[0.026])
         test_nodes = gd[0].get_nodes()
         true_nodes = np.arange(-0.74, 1.25, 0.026)

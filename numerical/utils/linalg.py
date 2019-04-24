@@ -22,3 +22,13 @@ def multi_dot2(*vectors, flatten=False, reshape=False):
     if reshape:
         md = md.reshape(-1, 1)
     return md
+
+
+def polar2cartesian(x):
+    """ Transform polar coordinates to cartesian.
+
+    Coordinates order:
+        x[0] ~ ro
+        x[1] ~ phi
+    """
+    return np.array([x[0] * np.cos(x[1]), x[0] * np.sin(x[1])], dtype=np.float64)

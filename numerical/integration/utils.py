@@ -1,4 +1,5 @@
 import numpy as np
+from numerical.utils.linalg import polar2cartesian
 
 
 def repeat_args(f_args, n_roots, cnt_reps):
@@ -27,3 +28,12 @@ def repeat_args(f_args, n_roots, cnt_reps):
 
     else:
         raise ValueError("Repeating arguments for dims > 3 is not implemented.")
+
+
+def coordinate_transform(ndfunc, ndgrid):
+    if ndgrid.coords_type == "polar":
+        def ndfunc_t(x):
+            return ndfunc(polar2cartesian(x)) * x[0]
+        return ndfunc_t
+    else:
+        return ndfunc
