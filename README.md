@@ -11,13 +11,9 @@ This repository contains tools for math numerical computation such as numerical 
 ```python
 import numpy as np
 from numerical.integration import gauss
-from numerical.area import bounds
-from numerical.area import grid
 
 def f(x):
     return np.power(x[0], 2)
 
-bd = bounds.cartesian.LineBoundary1D(0, 1)
-gd = grid.UniformGrid(bd, step=[0.02])
-gauss.integrate(f, gd)
+gauss.integrate(f, 0., 1.)
 ```
