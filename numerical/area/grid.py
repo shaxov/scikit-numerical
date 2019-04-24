@@ -13,31 +13,6 @@ class _BaseGrid(metaclass=ABCMeta):
         """ Defines str representation of grid object. """
 
 
-class _GridIterable(metaclass=ABCMeta):
-    """ The class represents iterator interface for grid. """
-
-    def __init__(self, data: list):
-        self._data = data
-        self.dim = len(data)
-
-    def __iter__(self):
-        self._grid_id = 0
-        return self
-
-    def __next__(self):
-        if self._grid_id == self.dim:
-            raise StopIteration
-        grid = self._data[self._grid_id]
-        self._grid_id += 1
-        return grid
-
-    def __getitem__(self, item):
-        return self._data[item]
-
-    def __repr__(self):
-        return "<[" + ", ".join([grd.__repr__() for grd in self._data]) + "]>"
-
-
 class _UniformGrid(_BaseGrid):
     """ Class defines uniform grid object.
 
@@ -62,7 +37,7 @@ class _UniformGrid(_BaseGrid):
             f"nodes_count={len(self.nodes)}>"
 
 
-class UniformGrid(_GridIterable):
+class UniformGrid:
     def __init__(self, bounds: tuple, steps: tuple):
         try:
             bounds = np.array(bounds).reshape(-1, 2)
@@ -79,6 +54,22 @@ class UniformGrid(_GridIterable):
         if len(bounds) != len(steps):
             raise ValueError(f"Boundary dimension and steps count don't match. {len(bounds)} != {len(steps)}")
 
-        super().__init__(
-            [_UniformGrid(*bd, st) for bd, st in zip(bounds, steps)]
-        )
+        self._grids = [_UniformGrid(*bd, st) for bd, st in zip(bounds, steps)]
+        self.dim = len(self._grids)
+
+    def __iter__(self):
+        self._grid_id = 0
+        return self
+
+    def __next__(self):
+        if self._grid_id == self.dim:
+            raise StopIteration
+        grid = self._grids[self._grid_id]
+        self._grid_id += 1
+        return grid
+
+    def __getitem__(self, item):
+        return self._grids[item]
+
+    def __repr__(self):
+        return "<[" + ", ".join([grd.__repr__() for grd in self._grids]) + "]>"
