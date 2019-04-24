@@ -54,9 +54,6 @@ class _UniformGrid(_BaseGrid):
         self.nodes = np.arange(self.start, self.end, self.step)
         self.nodes = np.append(self.nodes, self.end)
 
-    def get_nodes(self):
-        return self.nodes
-
     def __repr__(self):
         return f"<{self.__class__.__name__}: " \
             f"start={self.start}, " \
