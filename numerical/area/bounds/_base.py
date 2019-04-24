@@ -57,7 +57,7 @@ class LineBoundary(BaseBoundary):
             raise BoundarySetupException
 
     def _is_valid(self):
-        return self.end > self.start and not np.allclose(self.start, self.end)
+        return self.end > self.start
 
     def plot(self, save_path=None):
         plt.hlines(0.0, self.start, self.end, colors='black')
