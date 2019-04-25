@@ -24,9 +24,9 @@ This repository contains tools for math numerical computation such as numerical 
     import matplotlib.pyplot as plt
     
     x = np.arange(0, 4., 0.05)
-    y = splines.shenberg(x)
-    yd1 = splines.shenberg.d1(x)  # first derivative
-    yd2 = splines.shenberg.d2(x)  # second derivative
+    y = splines.schoenberg(x)
+    yd1 = splines.schoenberg.deriv(x, order=1)  # first derivative
+    yd2 = splines.schoenberg.deriv(x, order=2)  # second derivative
     # visualize results
     plt.plot(x, y)
     plt.plot(x, yd1)
