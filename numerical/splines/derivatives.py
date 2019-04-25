@@ -75,11 +75,10 @@ class setup:
 
     def __call__(self, f):
         if self.ftype == "numerical":
-            f = eval(f"{f.__name__}(max_order={self.max_order})(f)",
-                     {
-                         'f': f,
-                         'shenberg': _shengerg_spline_derivatives,
-                     })
+            if f.__name__ == "shenberg":
+                f = _shengerg_spline_derivatives(max_order=self.max_order)(f)
+            else:
+                raise NotImplementedError
         elif self.ftype == "symbolical":
             raise NotImplementedError
         else:
