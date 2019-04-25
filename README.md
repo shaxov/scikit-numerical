@@ -5,7 +5,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/e599de8c6de048ef8351811388c63632)](https://www.codacy.com/app/maksym.shpakovych/numerical?utm_source=github.com&utm_medium=referral&utm_content=Bellator95/scikit-numerical&utm_campaign=Badge_Coverage)
 
 This repository contains tools for math numerical computation such as numerical integration and interpolation. The current implementation contains:
-- numerical integration using Gauss formula
+-   numerical integration using Gauss formula
 
     ```python
     import numpy as np
@@ -17,7 +17,8 @@ This repository contains tools for math numerical computation such as numerical 
     gauss.integrate(f, 0., 1.)  # 0.3333333
   
     ```
-- spline functions and theirs derivatives
+    
+-   spline functions and theirs derivatives
 
     ```python
     import numpy as np
