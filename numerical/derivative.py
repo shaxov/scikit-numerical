@@ -1,15 +1,15 @@
-from numerical.splines.derivatives import shengerg_spline_derivatives
+from numerical.splines.derivatives import schoenberg_spline_derivatives
 
 
 class setup:
-    def __init__(self, ftype: str, max_order: [int, tuple]):
+    def __init__(self, ftype: str, max_order: [int, tuple] = None):
         self.ftype = ftype
         self.max_order = max_order
 
     def __call__(self, f):
         if self.ftype == "numerical":
-            if f.__name__ == "shenberg":
-                f = shengerg_spline_derivatives(max_order=self.max_order)(f)
+            if f.__name__ == "schoenberg":
+                f = schoenberg_spline_derivatives(f)
             else:
                 raise NotImplementedError
         elif self.ftype == "symbolical":
