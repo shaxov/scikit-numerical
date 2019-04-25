@@ -2,20 +2,25 @@ import numpy as np
 from numpy import power as Power
 
 
-class shengerg_spline_derivatives:
-    def __init__(self, max_order=3):
-        if max_order > 3:
-            raise NotImplementedError(f"Derivative os order {max_order} for Shenberg splines is not implemented. "
+def schoenberg_spline_derivatives(f):
+    def deriv(x, order):
+        if isinstance(order, tuple):
+            if len(order) > 1:
+                raise ValueError("Function is 1-dimensional. Mixed derivative does not exist.")
+            if len(order) == 0:
+                raise ValueError("Please, specify the order of derivative.")
+            order = order[0]
+        if order == 1:
+            return _deriv1(x)
+        elif order == 2:
+            return _deriv2(x)
+        elif order == 3:
+            return _deriv3(x)
+        else:
+            raise NotImplementedError(f"Derivative of order {order} for Schoenberg splines is not implemented. "
                                       f"Max order of available derivative is 3.")
-        self._max_order = max_order
 
-    def __call__(self, f):
-        for i in range(self._max_order):
-            f.__dict__[f'd{i + 1}'] = shengerg_spline_derivatives.__dict__[f'd{i + 1}'].__func__
-        return f
-
-    @staticmethod
-    def d1(x: np.array) -> np.array:
+    def _deriv1(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -33,8 +38,7 @@ class shengerg_spline_derivatives:
         fx[idx] = 0
         return fx
 
-    @staticmethod
-    def d2(x: np.array) -> np.array:
+    def _deriv2(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -50,8 +54,7 @@ class shengerg_spline_derivatives:
         fx[idx] = 0
         return fx
 
-    @staticmethod
-    def d3(x: np.array) -> np.array:
+    def _deriv3(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -66,3 +69,6 @@ class shengerg_spline_derivatives:
         idx = np.logical_and(x < 0., x >= 3.)
         fx[idx] = 0
         return fx
+
+    f.deriv = deriv
+    return f
