@@ -2,7 +2,7 @@ import numpy as np
 from numpy import power as Power
 
 
-class _shengerg_spline_derivatives:
+class shengerg_spline_derivatives:
     def __init__(self, max_order=3):
         if max_order > 3:
             raise NotImplementedError(f"Derivative os order {max_order} for Shenberg splines is not implemented. "
@@ -11,7 +11,7 @@ class _shengerg_spline_derivatives:
 
     def __call__(self, f):
         for i in range(self._max_order):
-            f.__dict__[f'd{i + 1}'] = _shengerg_spline_derivatives.__dict__[f'd{i + 1}'].__func__
+            f.__dict__[f'd{i + 1}'] = shengerg_spline_derivatives.__dict__[f'd{i + 1}'].__func__
         return f
 
     @staticmethod
@@ -66,21 +66,3 @@ class _shengerg_spline_derivatives:
         idx = np.logical_and(x < 0., x >= 3.)
         fx[idx] = 0
         return fx
-
-
-class setup:
-    def __init__(self, ftype: str, max_order: [int, tuple]):
-        self.ftype = ftype
-        self.max_order = max_order
-
-    def __call__(self, f):
-        if self.ftype == "numerical":
-            if f.__name__ == "shenberg":
-                f = _shengerg_spline_derivatives(max_order=self.max_order)(f)
-            else:
-                raise NotImplementedError
-        elif self.ftype == "symbolical":
-            raise NotImplementedError
-        else:
-            raise ValueError(f"ftype '{self.ftype}' is not valid. Please use 'numerical' or 'symbolical' type.")
-        return f

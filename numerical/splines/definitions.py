@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import power as Power
 
-from numerical.splines import derivatives
+from numerical import derivative
 
 
 def linear(x: np.array) -> np.array:
@@ -20,7 +20,7 @@ def linear(x: np.array) -> np.array:
     return fx
 
 
-@derivatives.setup(ftype="numerical", max_order=3)
+@derivative.setup(ftype="numerical", max_order=3)
 def shenberg(x: np.array) -> np.array:
     """ One-dimensional Shenberg spline of 5-th order.
 
