@@ -1,6 +1,6 @@
 from .definitions import (
     linear,
-    shenberg,
+    schoenberg,
 )
 
-__all__ = ['linear', 'shenberg']
+__all__ = ['linear', 'schoenberg']
