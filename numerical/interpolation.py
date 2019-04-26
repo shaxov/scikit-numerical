@@ -4,12 +4,12 @@ from numerical import splines
 from numerical.utils.interpolation import repeat_args
 
 
-def interpolate(values: np.array, nodes: list, batch_size=16, bfunc=None):
+def interpolate(values, meshgrid, batch_size=16, bfunc=None):
     """ Builds function which is an interpolation function on nodes with computer values in these nodes.
 
     Args:
         values: list of function values in grid nodes.
-        nodes: points where function was calculated.
+        meshgrid: points where function was calculated.
         batch_size: int, batch size for interpolation process.
         bfunc: basis function which is used to interpolate spaces between nodes.
 
@@ -20,11 +20,11 @@ def interpolate(values: np.array, nodes: list, batch_size=16, bfunc=None):
     if bfunc is None:
         bfunc = splines.linear
 
-    nodes_range = [(dim.min(), dim.max()) for dim in nodes]
-    nodes_count = nodes[0].shape
-    nodes_dim = len(nodes)
-
+    nodes_range = [(grid.min(), grid.max()) for grid in meshgrid]
+    nodes_count = meshgrid[0].shape
+    nodes_dim = len(meshgrid)
     shift_indexes = [np.arange(0, dim, dtype=np.float64) for dim in nodes_count]
+    values = values.ravel()
 
     def _interpolated(x):
         """ Interpolated function.
@@ -43,7 +43,7 @@ def interpolate(values: np.array, nodes: list, batch_size=16, bfunc=None):
         batch_position = 0
         _interpolation_loop(result, x, values, bfunc, nodes_range, nodes_count,
                             nodes_dim, shift_indexes, batch_position, batch_size)
-        return result
+        return np.concatenate(result)
 
     return _interpolated
 
@@ -59,7 +59,9 @@ def _interpolation_loop(result, x, values, bfunc, nodes_range, nodes_count,
             args.append(arg)
 
         rep_args = repeat_args(args, nodes_count)
-        spline_val = np.prod([bfunc(arg) for arg in rep_args], axis=0)
+        spline_val = np.prod(np.array([bfunc(arg) for arg in rep_args]), axis=0)
+        if len(spline_val.shape) == 1:
+            spline_val = spline_val.reshape(1, -1)
         result.append(np.dot(spline_val, values))
         batch_position += batch_size
 
@@ -68,24 +70,40 @@ if __name__ == '__main__':
     def fun(x):
         return np.power(x, 2) + 4
 
-    nodes = [np.arange(0, 9.20001, 0.2)]
-    values = fun(nodes[0])
+    meshgrid = [np.arange(0, 9.20001, 0.2)]
+    values = fun(meshgrid)
 
-    spline_fun = interpolate(values, nodes)
-    assert np.allclose(spline_fun(np.array([[0.4684]])), np.float64(4.2284), atol=1e-8)
+    spline_fun = interpolate(values, meshgrid)
+    assert np.allclose(spline_fun(np.array([[0.4684, 0.4684]])), np.float64(4.2284), atol=1e-8)
     assert np.allclose(spline_fun(np.array([[2.6594]])), np.float64(11.0808), atol=1e-8)
 
-    # boundary_x = Boundary(0, 1)
-    # boundary_y = Boundary(0, 1)
-    # boundary_z = Boundary(0, 1)
-    # gridd = Grid([boundary_x, boundary_y, boundary_z], [0.01, 0.01, 0.01])
-    #
-    #
+
+    def fun(x):
+        return np.power(x[0], 3) * x[1] + 7 * x[1] + np.power(x[0], 0.5)
+
+
+    grid1 = np.arange(0, 2.0001, 0.01)
+    grid2 = np.arange(0, 1.0001, 0.01)
+    meshgrid = np.meshgrid(grid1, grid2, indexing='ij')
+    values = fun(meshgrid)
+
+    spline_fun = interpolate(values, meshgrid)
+
+    assert np.allclose(spline_fun(np.array([[0.5], [0.5]])), fun(np.array([[0.5], [0.5]])))
+    assert np.allclose(spline_fun(np.array([[0.25], [0.786]])), fun(np.array([[0.25], [0.786]])))
+
     def fun(x):
         return (7 * x[0] * x[2] - np.power(x[1], 2)) * x[2]
-    #
-    # #tabs = func(grid['mesh'].T)
-    # spline_fun = bspline_interpolation(tabs, grid, 16)
-    #
-    # assert np.allclose(spline_fun(np.array([[0.5, 0.5], [0.5, 0.5], [0.5, 0.5]])), [0.75])
-    # assert np.allclose(spline_fun(np.array([[[0.25]], [[0.786]], [[0.3335]]])), [-0.01136422])
+
+
+    grid1 = np.arange(0, 2.0001, 0.01)
+    grid2 = np.arange(0, 1.0001, 0.01)
+    grid3 = np.arange(0, 1.0001, 0.01)
+
+    meshgrid = np.meshgrid(grid1, grid2, grid3, indexing='ij')
+    values = fun(meshgrid)
+
+    spline_fun = interpolate(values, meshgrid)
+
+    assert np.allclose(spline_fun(np.array([[0.5, 0.5], [0.5, 0.5], [0.5, 0.5]])), [0.75])
+    assert np.allclose(spline_fun(np.array([[0.25], [0.786], [0.3335]])), [-0.01136422])
