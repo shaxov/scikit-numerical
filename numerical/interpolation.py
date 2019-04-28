@@ -9,7 +9,7 @@ def interpolate(values, meshgrid, batch_size=16, bfunc=None):
 
     Args:
         values: list of function values in grid nodes.
-        meshgrid: points where function was calculated.
+        meshgrid: points where function was calculated used np.meshgrid function with parameter 'indexing='ij''.
         batch_size: int, batch size for interpolation process.
         bfunc: basis function which is used to interpolate spaces between nodes.
 
@@ -64,64 +64,3 @@ def _interpolation_loop(result, x, values, bfunc, nodes_range, nodes_count,
             spline_val = spline_val.reshape(1, -1)
         result.append(np.dot(spline_val, values))
         batch_position += batch_size
-
-
-if __name__ == '__main__':
-    def fun(x):
-        return np.power(x[0], 2) + 4
-
-    meshgrid = [np.arange(0, 1.000001, 0.001)]
-    values = fun(meshgrid)
-
-    spline_fun = interpolate(values, meshgrid)
-    x = np.random.rand(1, 10)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(1, 10, 10)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(1, 10, 10, 10)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-
-    def fun(x):
-        return np.power(x[0], 3) * x[1] + 7 * x[1] + np.power(x[0], 0.5)
-
-
-    grid1 = np.arange(0, 1.0001, 0.01)
-    grid2 = np.arange(0, 1.0001, 0.01)
-    meshgrid = np.meshgrid(grid1, grid2, indexing='ij')
-    values = fun(meshgrid)
-
-    spline_fun = interpolate(values, meshgrid)
-
-    x = np.random.rand(2, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(2, 5, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(2, 5, 5, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    def fun(x):
-        return (7 * x[0] * x[2] - np.power(x[1], 2)) * x[2]
-
-
-    grid1 = np.arange(0, 1.0001, 0.01)
-    grid2 = np.arange(0, 1.0001, 0.01)
-    grid3 = np.arange(0, 1.0001, 0.01)
-
-    meshgrid = np.meshgrid(grid1, grid2, grid3, indexing='ij')
-    values = fun(meshgrid)
-
-    spline_fun = interpolate(values, meshgrid)
-
-    x = np.random.rand(3, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(3, 5, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
-
-    x = np.random.rand(3, 5, 5, 5)
-    assert np.allclose(spline_fun(x), fun(x), atol=1e-2, rtol=1e-2)
