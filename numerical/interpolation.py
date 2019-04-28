@@ -4,21 +4,19 @@ from numerical import splines
 from numerical.utils.interpolation import repeat_args
 
 
-def interpolate(values, meshgrid, batch_size=16, bfunc=None):
+def interpolate(values, meshgrid, batch_size=16):
     """ Builds function which is an interpolation function on nodes with computer values in these nodes.
 
     Args:
         values: list of function values in grid nodes.
         meshgrid: points where function was calculated used np.meshgrid function with parameter 'indexing='ij''.
         batch_size: int, batch size for interpolation process.
-        bfunc: basis function which is used to interpolate spaces between nodes.
 
     Returns:
         interpolated function.
     """
-    # if basis function is not set, linear interpolation will be used
-    if bfunc is None:
-        bfunc = splines.linear
+    # linear interpolation will be used as a basis function
+    bfunc = splines.linear
 
     nodes_range = [(grid.min(), grid.max()) for grid in meshgrid]
     nodes_count = meshgrid[0].shape
