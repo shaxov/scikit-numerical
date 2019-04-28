@@ -37,3 +37,27 @@ This repository contains tools for math numerical computation such as numerical 
     plt.show()
   
     ```
+
+
+-   function interpolation
+
+    ```python
+    import numpy as np
+    from numerical import interpolate
+    import matplotlib.pyplot as plt
+    
+    def fun(x):
+        return 1 - np.power(x[0] - 0.5, 2)
+
+    meshgrid = np.array([np.arange(0, 1.0001, 0.25)])
+    values = fun(meshgrid)
+    itp_fun = interpolate(values, meshgrid)
+    
+    x = np.arange(0., 1.00001, 0.001).reshape(1, -1)
+    y_intp = itp_fun(x)
+    y_true = fun(x)
+
+    plt.plot(x[0], y_intp)
+    plt.plot(x[0], y_true)
+    plt.show()
+    ```
