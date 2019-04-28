@@ -17,7 +17,8 @@ This repository contains tools for math numerical computation such as numerical 
     gauss.integrate(f, 0., 1.)  # 0.3333333
   
     ```
-    
+
+
 -   spline functions and theirs derivatives
 
     ```python
