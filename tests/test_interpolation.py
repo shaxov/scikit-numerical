@@ -28,7 +28,7 @@ class InterpolationTest(unittest.TestCase):
         grid1 = np.arange(0, 1.0001, 0.01)
         grid2 = np.arange(0, 1.0001, 0.01)
         meshgrid = np.meshgrid(grid1, grid2, indexing='ij')
-        values = fun(meshgrid)
+        values = fun2d(meshgrid)
 
         spline_fun = interpolate(values, meshgrid, 1)
 
@@ -49,7 +49,7 @@ class InterpolationTest(unittest.TestCase):
         grid3 = np.arange(0, 1.0001, 0.01)
 
         meshgrid = np.meshgrid(grid1, grid2, grid3, indexing='ij')
-        values = fun(meshgrid)
+        values = fun3d(meshgrid)
 
         spline_fun = interpolate(values, meshgrid, 1)
 
