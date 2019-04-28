@@ -38,6 +38,8 @@ This repository contains tools for math numerical computation such as numerical 
   
     ```
 
+![spline_derivs](https://github.com/Bellator95/scikit-numerical/blob/master/images/shenberg_spline_derivatives.png)
+
 
 -   function interpolation
 
@@ -61,3 +63,5 @@ This repository contains tools for math numerical computation such as numerical 
     plt.plot(x[0], y_true)
     plt.show()
     ```
+    
+![linear_interpolation](https://github.com/Bellator95/scikit-numerical/blob/master/images/linear_interpolation.png)
