@@ -22,7 +22,7 @@ def linear(x: np.array) -> np.array:
 
 @derivative.setup(ftype="numerical")
 def schoenberg(x: np.array) -> np.array:
-    """ One-dimensional Shenberg spline of 5-th order.
+    """ One-dimensional Schoenberg spline of 5-th order.
 
     Spline defined on the interval (0, 3)
     """
