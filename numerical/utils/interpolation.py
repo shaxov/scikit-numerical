@@ -33,4 +33,4 @@ def repeat_args(args, nodes_count):
         dd3 = np.expand_dims(d3, -1)
         return np.rollaxis(np.concatenate([dd1, dd2, dd3], -1), -1, 0)
     else:
-        raise ValueError("Repeat arguments was not implemented for dim > 3")
+        raise ValueError("Repeat arguments is not implemented for dim > 3")
