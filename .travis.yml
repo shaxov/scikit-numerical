@@ -16,4 +16,5 @@ env:
 
 script:
   - set -o pipefail
+  - python -m unittest discover tests
   - bash .testcov
