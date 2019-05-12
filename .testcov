@@ -5,3 +5,4 @@ python -m coverage run --source=. -m unittest discover -s tests
 python -m coverage report
 python -m coverage xml
 python -m codacy -r coverage.xml
+
