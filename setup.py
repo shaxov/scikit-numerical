@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="scikit-numerical",
-    version="0.0.8",
+    version="0.0.9",
     author="Maksym Shpakovych",
     author_email="maksym.shpakovych@gmail.com",
     description="Tools for numerical math calculations",
