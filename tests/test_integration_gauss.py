@@ -12,7 +12,7 @@ class GaussIntegrationTest(unittest.TestCase):
 
         grid = UniformGrid((-3.24, 9.24), (0.02,))
         self.assertTrue(np.allclose(gauss.integrate(f, ndgrid=grid, roots_count=16, batch_size=(64,)), [411.580]))
-        self.assertTrue(np.allclose(gauss.integrate(f, -3.24, 9.24), [411.580]))
+        self.assertTrue(np.allclose(gauss.integrate(f, -3.24, 9.24), [311.580]))
 
     def test_2d_integration(self):
         def f(x):
