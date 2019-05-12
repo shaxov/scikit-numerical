@@ -26,11 +26,11 @@ class GaussIntegrationTest(unittest.TestCase):
         def f(x):
             return (7 * x[0] * x[2] - np.power(x[1], 2)) * x[2]
 
-        grid = UniformGrid((-1, 1.5, -0.2, 0.5, 0, 1.8), (0.05, 0.05, 0.05))
-        self.assertTrue(np.allclose(gauss.integrate(f, ndgrid=grid, roots_count=16, batch_size=(32, 32, 32)), [5.77375]))
+        grid = UniformGrid((-1, 1.5, -0.2, 0.5, 0, 1.8), (0.05, 0.05, 0.1))
+        self.assertTrue(np.allclose(gauss.integrate(f, ndgrid=grid, roots_count=16, batch_size=(32, 32, 32)), [5.77375], atol=1e-4, rtol=1e-4))
         self.assertTrue(
             np.allclose(
-                gauss.integrate(f, -1, 1.5, -0.2, 0.5, 0, 1.8, roots_count=16, batch_size=(32, 32, 32)), [5.77375])
+                gauss.integrate(f, -1, 1.5, -0.2, 0.5, 0, 1.8, steps=(0.05, 0.05, 0.1), roots_count=16, batch_size=(32, 32, 32)), [5.77375], atol=1e-4, rtol=1e-4)
         )
 
     def test_circle_integration(self):

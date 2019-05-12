@@ -14,13 +14,13 @@ class InterpolationTest(unittest.TestCase):
 
         spline_fun = interpolate(values, meshgrid, 1)
         x = np.random.rand(1, 10)
-        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(1, 10, 10)
-        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(1, 10, 10, 10)
-        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-1, rtol=1e-1))
 
         def fun2d(x):
             return np.power(x[0], 3) * x[1] + 7 * x[1] + np.power(x[0], 0.5)
@@ -33,13 +33,13 @@ class InterpolationTest(unittest.TestCase):
         spline_fun = interpolate(values, meshgrid, 1)
 
         x = np.random.rand(2, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(2, 5, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(2, 5, 5, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-1, rtol=1e-1))
 
         def fun3d(x):
             return (7 * x[0] * x[2] - np.power(x[1], 2)) * x[2]
@@ -54,10 +54,10 @@ class InterpolationTest(unittest.TestCase):
         spline_fun = interpolate(values, meshgrid, 1)
 
         x = np.random.rand(3, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(3, 5, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-1, rtol=1e-1))
 
         x = np.random.rand(3, 5, 5, 5)
-        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-2, rtol=1e-2))
+        self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-1, rtol=1e-1))
