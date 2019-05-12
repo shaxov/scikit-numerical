@@ -14,4 +14,6 @@ install:
 env:
   - export CODACY_PROJECT_TOKEN=df8b7686f6d24f9787c4862b791a2fb8
 
-script: bash .testcov
+script:
+  - set -o pipefail
+  - bash .testcov
