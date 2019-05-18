@@ -54,8 +54,24 @@ class UniformGrid:
         if len(bounds) != len(steps):
             raise ValueError(f"Boundary dimension and steps count don't match. {len(bounds)} != {len(steps)}")
 
-        self._grids = [_UniformGrid(*bd, st) for bd, st in zip(bounds, steps)]
+        self._bounds = bounds
+        self._steps = steps
+
+        self._build()
+
+    def _build(self):
+        self._grids = [_UniformGrid(*bd, st) for bd, st in zip(self._bounds, self._steps)]
         self.dim = len(self._grids)
+        self.mesh = np.meshgrid(*[g.nodes for g in self._grids])
+
+    @property
+    def steps(self):
+        return self._steps
+
+    @steps.setter
+    def steps(self, value):
+        self._steps = value
+        self._build()
 
     def __iter__(self):
         self._grid_id = 0

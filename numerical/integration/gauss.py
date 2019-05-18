@@ -9,7 +9,7 @@ def integrate(ndfunc: "numpy function",
               *bounds: "integration limits",
               steps: tuple = (),
               coords_type="cartesian",
-              ndgrid: "area grid" = None,
+              ndgrid: grid.UniformGrid = None,
               roots_count: int = 32,
               batch_size: tuple = None):
     """ Integrate a function numerically using Gauss formula
@@ -72,7 +72,7 @@ def _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, ro
         result_list.append(fw_mul)
     else:
         nest_id += 1
-        while batch_position[nest_id] < ndgrid[nest_id].nodes_count:
+        while batch_position[nest_id] < ndgrid[nest_id].nodes_count - 1:
             _integration_loop(result_list, ndfunc, ndgrid, nd_leg_weights, leg_roots, roots_count,
                               batch_position, batch_size, nest_id)
             batch_position[nest_id] += batch_size[nest_id]
