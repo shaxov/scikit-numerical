@@ -13,7 +13,7 @@ def repeat_args(f_args, n_roots, cnt_reps):
         list of numpy.ndarray of repeated arguments' value.
     """
     if len(f_args) == 1:
-        return f_args
+        return np.array(f_args)
 
     elif len(f_args) == 2:
         xx_rep = np.repeat(np.repeat(f_args[0], n_roots, axis=1), repeats=cnt_reps[1], axis=0)
