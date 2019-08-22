@@ -12,7 +12,7 @@ class InterpolationTest(unittest.TestCase):
         meshgrid = [np.arange(0, 1.000001, 0.001)]
         values = fun1d(meshgrid)
 
-        spline_fun = interpolate(values, meshgrid, 1)
+        spline_fun = interpolate(values, meshgrid)
         x = np.random.rand(1, 10)
         self.assertTrue(np.allclose(spline_fun(x), fun1d(x), atol=1e-1, rtol=1e-1))
 
@@ -30,7 +30,7 @@ class InterpolationTest(unittest.TestCase):
         meshgrid = np.meshgrid(grid1, grid2, indexing='ij')
         values = fun2d(meshgrid)
 
-        spline_fun = interpolate(values, meshgrid, 1)
+        spline_fun = interpolate(values, meshgrid)
 
         x = np.random.rand(2, 5)
         self.assertTrue(np.allclose(spline_fun(x), fun2d(x), atol=1e-1, rtol=1e-1))
@@ -51,7 +51,7 @@ class InterpolationTest(unittest.TestCase):
         meshgrid = np.meshgrid(grid1, grid2, grid3, indexing='ij')
         values = fun3d(meshgrid)
 
-        spline_fun = interpolate(values, meshgrid, 1)
+        spline_fun = interpolate(values, meshgrid)
 
         x = np.random.rand(3, 5)
         self.assertTrue(np.allclose(spline_fun(x), fun3d(x), atol=1e-1, rtol=1e-1))
