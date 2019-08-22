@@ -135,9 +135,9 @@ static PyObject* line_interpolate_2d(PyObject* self, PyObject* args, PyObject* k
 
     PyArrayObject *in_array_x1, *in_array_x2, *in_array_uniform_tabs;
     PyObject      *out_array;
-    NpyIter *in_iter_x1, *in_iter_x2, *in_iter_uniform_tabs;
+    NpyIter *in_iter_x1, *in_iter_x2; //, *in_iter_uniform_tabs;
     NpyIter *out_iter;
-    NpyIter_IterNextFunc *in_iternext_x1, *in_iternext_x2, *in_iternext_uniform_tabs;
+    NpyIter_IterNextFunc *in_iternext_x1, *in_iternext_x2; //, *in_iternext_uniform_tabs;
     NpyIter_IterNextFunc *out_iternext;
 
     /*  parse single numpy array argument */
@@ -164,9 +164,9 @@ static PyObject* line_interpolate_2d(PyObject* self, PyObject* args, PyObject* k
     /*  create the iterators */
     in_iter_x1 = NpyIter_New(in_array_x1, NPY_ITER_READONLY, NPY_KEEPORDER, NPY_NO_CASTING, NULL);
     in_iter_x2 = NpyIter_New(in_array_x2, NPY_ITER_READONLY, NPY_KEEPORDER, NPY_NO_CASTING, NULL);
-    in_iter_uniform_tabs = NpyIter_New(in_array_uniform_tabs, NPY_ITER_READONLY, NPY_KEEPORDER, NPY_NO_CASTING, NULL);
+//    in_iter_uniform_tabs = NpyIter_New(in_array_uniform_tabs, NPY_ITER_READONLY, NPY_KEEPORDER, NPY_NO_CASTING, NULL);
 
-    if (in_iter_x1 == NULL || in_iter_x2 == NULL || in_iter_uniform_tabs == NULL)
+    if (in_iter_x1 == NULL || in_iter_x2 == NULL)
         goto fail;
 
     out_iter = NpyIter_New((PyArrayObject *)out_array, NPY_ITER_READWRITE,
@@ -174,30 +174,32 @@ static PyObject* line_interpolate_2d(PyObject* self, PyObject* args, PyObject* k
     if (out_iter == NULL) {
         NpyIter_Deallocate(in_iter_x1);
         NpyIter_Deallocate(in_iter_x2);
-        NpyIter_Deallocate(in_iter_uniform_tabs);
+//        NpyIter_Deallocate(in_iter_uniform_tabs);
+        NpyIter_Deallocate(out_iter);
         goto fail;
     }
 
     in_iternext_x1 = NpyIter_GetIterNext(in_iter_x1, NULL);
     in_iternext_x2 = NpyIter_GetIterNext(in_iter_x2, NULL);
-    in_iternext_uniform_tabs = NpyIter_GetIterNext(in_iter_uniform_tabs, NULL);
+    // in_iternext_uniform_tabs = NpyIter_GetIterNext(in_iter_uniform_tabs, NULL);
 
     out_iternext = NpyIter_GetIterNext(out_iter, NULL);
-    if (in_iternext_x1 == NULL || in_iternext_x2 == NULL || in_iternext_uniform_tabs == NULL || \
+    if (in_iternext_x1 == NULL || in_iternext_x2 == NULL || \
         out_iternext == NULL) {
         NpyIter_Deallocate(in_iter_x1);
         NpyIter_Deallocate(in_iter_x2);
-        NpyIter_Deallocate(in_iter_uniform_tabs);
+//        NpyIter_Deallocate(in_iter_uniform_tabs);
         NpyIter_Deallocate(out_iter);
         goto fail;
     }
     double ** in_dataptr_x1 = (double **) NpyIter_GetDataPtrArray(in_iter_x1);
     double ** in_dataptr_x2 = (double **) NpyIter_GetDataPtrArray(in_iter_x2);
-    double ** in_dataptr_uniform_tabs = (double **) NpyIter_GetDataPtrArray(in_iter_uniform_tabs);
+//    double ** in_dataptr_uniform_tabs = (double **) NpyIter_GetDataPtrArray(in_iter_uniform_tabs);
     double ** out_dataptr = (double **) NpyIter_GetDataPtrArray(out_iter);
 
     /*  iterate over the arrays */
     register double sum = 0.0;
+    double *aij;
     do
     {
         sum = 0.0;
@@ -205,23 +207,23 @@ static PyObject* line_interpolate_2d(PyObject* self, PyObject* args, PyObject* k
         {
             for (int j = 0; j < n2; ++j)
             {
-                sum += **in_dataptr_uniform_tabs * \
+                aij = (double*)PyArray_GETPTR2(in_array_uniform_tabs, i, j);
+                sum += *aij * \
                     _bSpline(((n1 - 1) * (**in_dataptr_x1 - a1)) / (b1 - a1) - i) * \
                     _bSpline(((n2 - 1) * (**in_dataptr_x2 - a2)) / (b2 - a2) - j);
-                in_iternext_uniform_tabs(in_iter_uniform_tabs);
             }
         }
 
         **out_dataptr = sum;
 
-        NpyIter_Reset(in_iter_uniform_tabs, NULL);
+        // NpyIter_Reset(in_iter_uniform_tabs, NULL);
     } while (in_iternext_x1(in_iter_x1) && in_iternext_x2(in_iter_x2) && out_iternext(out_iter));
 
 
     /*  clean up and return the result */
     NpyIter_Deallocate(in_iter_x1);
     NpyIter_Deallocate(in_iter_x2);
-    NpyIter_Deallocate(in_iter_uniform_tabs);
+//    NpyIter_Deallocate(in_iter_uniform_tabs);
     NpyIter_Deallocate(out_iter);
     Py_INCREF(out_array);
     return out_array;
