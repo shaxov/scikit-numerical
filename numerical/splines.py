@@ -42,3 +42,6 @@ def schoenberg(x: np.array) -> np.array:
     idx = np.logical_and(x < 0., x >= 3.)
     fx[idx] = 0
     return fx
+
+
+__all__ = ['linear', 'schoenberg']
