@@ -1,6 +1,6 @@
 import numpy as np
 
-from numerical import splines
+from numerical import spline
 from numerical.utils.interpolation import repeat_args
 
 
@@ -16,7 +16,7 @@ def interpolate(values, grid, batch_size=16):
         interpolated function.
     """
     # linear interpolation will be used as a basis function
-    bfunc = splines.linear
+    bfunc = spline.linear
 
     nodes_range = [(g.min(), g.max()) for g in grid]
     nodes_count = grid[0].shape

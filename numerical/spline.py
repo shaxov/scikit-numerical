@@ -20,8 +20,8 @@ def linear(x: np.array) -> np.array:
     return fx
 
 
-@derivative.setup
-def schoenberg(x: np.array) -> np.array:
+@derivative.setup(var_names=('x',))
+def schoenberg1d(x: np.array) -> np.array:
     """ One-dimensional Schoenberg spline of 5-th order.
 
     Spline defined on the interval (0, 3)
@@ -44,4 +44,9 @@ def schoenberg(x: np.array) -> np.array:
     return fx
 
 
-__all__ = ['linear', 'schoenberg']
+@derivative.setup(var_names=('x', 'y'))
+def schoenberg2d(x: np.array, y: np.array) -> np.array:
+    return schoenberg1d(x) * schoenberg1d(y)
+
+
+__all__ = ['linear', 'schoenberg1d', 'schoenberg2d']

@@ -1,93 +1,25 @@
-import numpy as np
-from numpy import power as Power
-from numerical import symfun
 import sympy
+from numerical import symfun
+from numerical import spline_derivs
 
 
-def _schoenberg_spline_derivatives(f):
-    def deriv(order):
-        if isinstance(order, tuple):
-            if len(order) > 1:
-                raise ValueError("Function is 1-dimensional. Mixed derivative does not exist.")
-            if len(order) == 0:
-                raise ValueError("Please, specify the order of derivative.")
-            order = order[0]
-        if order == 1:
-            return _deriv1
-        elif order == 2:
-            return _deriv2
-        elif order == 3:
-            return _deriv3
+class setup:
+    def __init__(self, var_names):
+        self._var_names = var_names
+
+    def __call__(self, func):
+        if func.__name__ == "schoenberg1d":
+            func = spline_derivs.schoenberg1d(func, self._var_names)
+        elif func.__name__ == "schoenberg2d":
+            func = spline_derivs.schoenberg2d(func, self._var_names)
         else:
-            raise NotImplementedError(f"Derivative of order {order} for Schoenberg splines is not implemented. "
-                                      f"Max order of available derivative is 3.")
-
-    def _deriv1(x: np.array) -> np.array:
-        fx = np.zeros_like(x)
-        # if x >= 0 and x < 1
-        idx = np.logical_and(x >= 0., x < 1.)
-        fx[idx] = -x[idx] + Power(x[idx], 3) - (5 * Power(x[idx], 4)) / 12.
-        # if x >= 1 and x < 2
-        idx = np.logical_and(x >= 1., x < 2.)
-        fx[idx] = 0.625 - (7 * x[idx]) / 2. + (15 * Power(x[idx], 2)) / 4. -\
-                  (3 * Power(x[idx], 3)) / 2. + (5 * Power(x[idx], 4)) / 24.
-        # if x >=2 and x < 3
-        idx = np.logical_and(x >= 2., x < 3.)
-        fx[idx] = -3.375 + (9 * x[idx]) / 2. - (9 * Power(x[idx], 2)) / 4. +\
-                  Power(x[idx], 3) / 2. - Power(x[idx], 4) / 24.
-        # if x < 0 and x > 3
-        idx = np.logical_and(x < 0., x >= 3.)
-        fx[idx] = 0
-        return fx
-
-    def _deriv2(x: np.array) -> np.array:
-        fx = np.zeros_like(x)
-        # if x >= 0 and x < 1
-        idx = np.logical_and(x >= 0., x < 1.)
-        fx[idx] = -1 + 3 * Power(x[idx], 2) - (5 * Power(x[idx], 3)) / 3.
-        # if x >= 1 and x < 2
-        idx = np.logical_and(x >= 1., x < 2.)
-        fx[idx] = -3.5 + (15 * x[idx]) / 2. - (9 * Power(x[idx], 2)) / 2. + (5 * Power(x[idx], 3)) / 6.
-        # if x >=2 and x < 3
-        idx = np.logical_and(x >= 2., x < 3.)
-        fx[idx] = 4.5 - (9 * x[idx]) / 2. + (3 * Power(x[idx], 2)) / 2. - Power(x[idx], 3) / 6.
-        # if x < 0 and x > 3
-        idx = np.logical_and(x < 0., x >= 3.)
-        fx[idx] = 0
-        return fx
-
-    def _deriv3(x: np.array) -> np.array:
-        fx = np.zeros_like(x)
-        # if x >= 0 and x < 1
-        idx = np.logical_and(x >= 0., x < 1.)
-        fx[idx] = 6 * x[idx] - 5 * Power(x[idx], 2)
-        # if x >= 1 and x < 2
-        idx = np.logical_and(x >= 1., x < 2.)
-        fx[idx] = 7.5 - 9 * x[idx] + (5 * Power(x[idx], 2)) / 2.
-        # if x >=2 and x < 3
-        idx = np.logical_and(x >= 2., x < 3.)
-        fx[idx] = -4.5 + 3 * x[idx] - Power(x[idx], 2) / 2.
-        # if x < 0 and x > 3
-        idx = np.logical_and(x < 0., x >= 3.)
-        fx[idx] = 0
-        return fx
-
-    f.deriv = deriv
-    return f
-
-
-def setup(func):
-    if func.__name__ == "schoenberg":
-        func = _schoenberg_spline_derivatives(func)
-    else:
-        raise NotImplementedError("Derivatives for function '{}' are not implemented".format(func.__name__))
-    return func
+            raise NotImplementedError("Derivatives for function '{}' are not implemented".format(func.__name__))
+        return func
 
 
 def diff(func, *args):
     if isinstance(func, symfun.SymbolicFunction):
-        return symfun.SymbolicFunction(str(sympy.diff(func.expr, *args)))
+        func = symfun.SymbolicFunction(str(sympy.diff(func.expr, *args)))
     else:
-        if len(args) > 2:
-            raise ValueError("Function is 1-dimensional. Mixed derivative does not exist.")
-        return func.deriv(order=args[1])
+        func = func.deriv(*args)
+    return func
