@@ -22,20 +22,25 @@ This repository contains tools for math numerical computation such as numerical 
 -   spline functions and theirs derivatives
 
     ```python
-    import numpy as np
-    from numerical import splines
-    import matplotlib.pyplot as plt
-    
-    x = np.arange(0, 4., 0.05)
-    y = splines.schoenberg(x)
-    yd1 = splines.schoenberg.deriv(x, order=1)  # first derivative
-    yd2 = splines.schoenberg.deriv(x, order=2)  # second derivative
-    # visualize results
-    plt.plot(x, y)
-    plt.plot(x, yd1)
-    plt.plot(x, yd2)
-    plt.show()
-  
+    ```python
+        import numpy as np
+        from numerical import spline
+        from numerical import diff
+        import matplotlib.pyplot as plt
+            
+        x = np.arange(0, 4., 0.05)
+        y = spline.schoenberg1d(x)
+        d1spline = diff(spline.schoenberg1d, "x", 1) # first derivative
+        yd1 = d1spline(x)
+        d2spline = diff(spline.schoenberg, "x", 2) # second derivative
+        yd2 = d2spline(x)  
+        # visualize results
+        plt.plot(x, y)
+        plt.plot(x, yd1)
+        plt.plot(x, yd2)
+        plt.show()
+          
+        ```
     ```
 
 ![spline_derivs](https://github.com/Bellator95/scikit-numerical/blob/master/images/shenberg_spline_derivatives.png)

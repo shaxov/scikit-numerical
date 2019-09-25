@@ -1,26 +1,11 @@
 import numpy as np
 from numpy import power as Power
+from numerical import spline
 
 
-def schoenberg_spline_derivatives(f):
-    def deriv(x, order):
-        if isinstance(order, tuple):
-            if len(order) > 1:
-                raise ValueError("Function is 1-dimensional. Mixed derivative does not exist.")
-            if len(order) == 0:
-                raise ValueError("Please, specify the order of derivative.")
-            order = order[0]
-        if order == 1:
-            return _deriv1(x)
-        elif order == 2:
-            return _deriv2(x)
-        elif order == 3:
-            return _deriv3(x)
-        else:
-            raise NotImplementedError(f"Derivative of order {order} for Schoenberg splines is not implemented. "
-                                      f"Max order of available derivative is 3.")
-
-    def _deriv1(x: np.array) -> np.array:
+class _Schoenberg1d:
+    @staticmethod
+    def deriv1(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -38,7 +23,8 @@ def schoenberg_spline_derivatives(f):
         fx[idx] = 0
         return fx
 
-    def _deriv2(x: np.array) -> np.array:
+    @staticmethod
+    def deriv2(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -54,7 +40,8 @@ def schoenberg_spline_derivatives(f):
         fx[idx] = 0
         return fx
 
-    def _deriv3(x: np.array) -> np.array:
+    @staticmethod
+    def deriv3(x: np.array) -> np.array:
         fx = np.zeros_like(x)
         # if x >= 0 and x < 1
         idx = np.logical_and(x >= 0., x < 1.)
@@ -70,5 +57,47 @@ def schoenberg_spline_derivatives(f):
         fx[idx] = 0
         return fx
 
-    f.deriv = deriv
+
+def schoenberg1d(f, active_vars: tuple):
+    _DERIVATIVES = {
+        (active_vars[0], 1): _Schoenberg1d.deriv1,
+        (active_vars[0], 2): _Schoenberg1d.deriv2,
+        (active_vars[0], 3): _Schoenberg1d.deriv3,
+    }
+    f.deriv = lambda *args: _DERIVATIVES[args]
+    return f
+
+
+def schoenberg2d(f, active_vars: tuple):
+
+    def _deriv10(x: np.array, y: np.array) -> np.array:
+        return _Schoenberg1d.deriv1(x) * spline.schoenberg1d(y)
+
+    def _deriv01(x: np.array, y: np.array) -> np.array:
+        return spline.schoenberg1d(x) * _Schoenberg1d.deriv1(y)
+
+    def _deriv11(x: np.array, y: np.array) -> np.array:
+        return _Schoenberg1d.deriv1(x) * _Schoenberg1d.deriv1(y)
+
+    def _deriv21(x: np.array, y: np.array) -> np.array:
+        return _Schoenberg1d.deriv2(x) * _Schoenberg1d.deriv1(y)
+
+    def _deriv12(x: np.array, y: np.array) -> np.array:
+        return _Schoenberg1d.deriv1(x) * _Schoenberg1d.deriv2(y)
+
+    _DERIVATIVES = {
+        (active_vars[0], 1): _deriv10,
+        (active_vars[1], 1): _deriv01,
+
+        (active_vars[0], 1, active_vars[1], 1): _deriv11,
+        (active_vars[1], 1, active_vars[0], 1): _deriv11,
+
+        (active_vars[0], 2, active_vars[1], 1): _deriv21,
+        (active_vars[1], 1, active_vars[0], 2): _deriv21,
+
+        (active_vars[0], 1, active_vars[1], 2): _deriv12,
+        (active_vars[1], 2, active_vars[0], 1): _deriv12,
+    }
+
+    f.deriv = lambda *args: _DERIVATIVES[args]
     return f

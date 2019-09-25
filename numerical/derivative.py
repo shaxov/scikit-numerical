@@ -1,19 +1,25 @@
-from numerical.splines.derivatives import schoenberg_spline_derivatives
+import sympy
+from numerical import symfun
+from numerical import spline_derivs
 
 
 class setup:
-    def __init__(self, ftype: str, max_order: [int, tuple] = None):
-        self.ftype = ftype
-        self.max_order = max_order
+    def __init__(self, var_names):
+        self._var_names = var_names
 
-    def __call__(self, f):
-        if self.ftype == "numerical":
-            if f.__name__ == "schoenberg":
-                f = schoenberg_spline_derivatives(f)
-            else:
-                raise NotImplementedError
-        elif self.ftype == "symbolical":
-            raise NotImplementedError
+    def __call__(self, func):
+        if func.__name__ == "schoenberg1d":
+            func = spline_derivs.schoenberg1d(func, self._var_names)
+        elif func.__name__ == "schoenberg2d":
+            func = spline_derivs.schoenberg2d(func, self._var_names)
         else:
-            raise ValueError(f"ftype '{self.ftype}' is not valid. Please use 'numerical' or 'symbolical' type.")
-        return f
+            raise NotImplementedError("Derivatives for function '{}' are not implemented".format(func.__name__))
+        return func
+
+
+def diff(func, *args):
+    if isinstance(func, symfun.SymbolicFunction):
+        func = symfun.SymbolicFunction(str(sympy.diff(func.expr, *args)))
+    else:
+        func = func.deriv(*args)
+    return func

@@ -1,4 +1,5 @@
 from numerical.interpolation import interpolate
+from numerical.derivative import diff
 
 
 name = "numerical"
