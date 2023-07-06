@@ -1,5 +1,5 @@
 numpy==1.16.1
-scipy==1.2.0
+scipy==1.10.0
 coverage==4.5.2
 codacy-coverage==1.3.11
 matplotlib==3.0.2
